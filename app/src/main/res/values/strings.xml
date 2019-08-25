@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">SchoolFood</string>
+    <string name="versionName">1.0</string>
+    <string name="transition_name_today_meal_card">transition:TODAY_MEAL_CARD</string>
+    <string name="transition_name_today_meal_text">transition:TODAY_MEAL_TEXT</string>
+
+    <string name="navigation_drawer_menu_communicate">소통하는 한가람</string>
+    <string name="navigation_drawer_menu_today_meal">오늘의 급식</string>
+    <string name="navigation_drawer_menu_school_menu">학교 메뉴</string>
+    <string name="navigation_drawer_menu_school_life">학교 생활</string>
+    <string name="navigation_drawer_menu_settings">설정</string>
+    <string name="action_help">도움말</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="date">날짜</string>
+    <string name="school_find">학교찾기</string>
+    <string name="school_name">학교이름</string>
+
 </resources>
