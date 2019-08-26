@@ -1,10 +1,22 @@
 package com.suncaption.schoolfood.api;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.suncaption.schoolfood.MainActivity;
+import com.suncaption.schoolfood.MyApp;
+import com.suncaption.schoolfood.R;
+import com.suncaption.schoolfood.SchoolAddActivity;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -21,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,34 +48,30 @@ import java.util.TimeZone;
  */
 public class School {
 
-    public enum TypeKorean {
 
-        /* 병설유치원 */ KINDERGARTEN("병설유치원"),
-        /* 초등학교 */ ELEMENTARY("초등학교"),
-        /* 중학교 */ MIDDLE("중학교"),
-        /* 고등학교 */ HIGH("고등학교");
 
-        private String id;
-        public String getId() {
-            return id;
-        }
-        TypeKorean(String id) {
-            this.id = id;
-        }
-    }
     /**
      * 불러올 교육청 소속 교육기관의 종류
      */
     public enum Type {
-        /* 병설유치원 */ KINDERGARTEN("1"),
-        /* 초등학교 */ ELEMENTARY("2"),
-        /* 중학교 */ MIDDLE("3"),
-        /* 고등학교 */ HIGH("4");
+        /* 병설유치원 */ KINDERGARTEN("1", "병설유치원"),
+        /* 초등학교 */ ELEMENTARY("2","초등학교"),
+        /* 중학교 */ MIDDLE("3","중학교"),
+        /* 고등학교 */ HIGH("4", "고등학교");
 
         private String id;
+        private String koreanName;
 
-        Type(String id) {
+        public String getId() {
+            return id;
+        }
+        public String getKoreanName() {
+            return koreanName;
+        }
+
+        Type(String id, String koreanName) {
             this.id = id;
+            this.koreanName = koreanName;
         }
     }
 
@@ -71,34 +80,52 @@ public class School {
      */
     public enum Region {
 
-        /* 서울 */ SEOUL("sen.go.kr"),
-        /* 인천 */ INCHEON("ice.go.kr"),
-        /* 부산 */ BUSAN("pen.go.kr"),
-        /* 광주 */ GWANGJU("gen.go.kr"),
-        /* 대전 */ DAEJEON("dje.go.kr"),
-        /* 대구 */ DAEGU("dge.go.kr"),
-        /* 세종 */ SEJONG("sje.go.kr"),
-        /* 울산 */ ULSAN("use.go.kr"),
-        /* 경기 */ GYEONGGI("goe.go.kr"),
-        /* 강원 */ KANGWON("kwe.go.kr"),
-        /* 충북 */ CHUNGBUK("cbe.go.kr"),
-        /* 충남 */ CHUNGNAM("cne.go.kr"),
-        /* 경북 */ GYEONGBUK("gbe.go.kr"),
-        /* 경남 */ GYEONGNAM("gne.go.kr"),
-        /* 전북 */ JEONBUK("jbe.go.kr"),
-        /* 전남 */ JEONNAM("jne.go.kr"),
-        /* 제주 */ JEJU("jje.go.kr");
+        /* 서울 */ SEOUL("sen.go.kr","서울"),
+        /* 인천 */ INCHEON("ice.go.kr","인천"),
+        /* 부산 */ BUSAN("pen.go.kr","부산"),
+        /* 광주 */ GWANGJU("gen.go.kr","광주"),
+        /* 대전 */ DAEJEON("dje.go.kr","대전"),
+        /* 대구 */ DAEGU("dge.go.kr","대구"),
+        /* 세종 */ SEJONG("sje.go.kr","세종"),
+        /* 울산 */ ULSAN("use.go.kr","울산"),
+        /* 경기 */ GYEONGGI("goe.go.kr","경기"),
+        /* 강원 */ KANGWON("kwe.go.kr","강원"),
+        /* 충북 */ CHUNGBUK("cbe.go.kr","충북"),
+        /* 충남 */ CHUNGNAM("cne.go.kr","충남"),
+        /* 경북 */ GYEONGBUK("gbe.go.kr","경북"),
+        /* 경남 */ GYEONGNAM("gne.go.kr","경남"),
+        /* 전북 */ JEONBUK("jbe.go.kr","전북"),
+        /* 전남 */ JEONNAM("jne.go.kr","전남"),
+        /* 제주 */ JEJU("jje.go.kr","제주");
 
         private String url;
+        private String koreanName;
 
-        Region(String url) {
+        public String getUrl() {
+            return url;
+        }
+        public String getKoreanName() {
+            return koreanName;
+        }
+        Region(String url, String koreanName) {
             this.url = url;
+            this.koreanName = koreanName;
         }
     }
 
     private static final String MONTHLY_MENU_URL = "sts_sci_md00_001.do";
     private static final String SCHEDULE_URL = "sts_sci_sf01_001.do";
     private static final String SCHOOL_CODE_URL = "spr_ccm_cm01_100.do";
+
+    public static Dialog match_text_dialog;
+    public static ListView textlist;
+    public static ArrayList<String> matches_text;
+
+    public static List<String> kraOrgNmList = new ArrayList<>();
+    public static List<String> schoolTypeList = new ArrayList<>();
+    public static List<String> schoolCodeList = new ArrayList<>();
+    public static List<String> zipAdresList = new ArrayList<>();
+
 
     /**
      * 교육기관의 종류
@@ -821,6 +848,128 @@ public class School {
             String schoolType = Utils.before(Utils.after(content,"schulCrseScCode\":\""), "\"");
 
             return new School(Type.values()[Integer.parseInt(schoolType) - 1], region, schoolCode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SchoolException("학교를 찾을 수 없습니다.");
+        }
+    }
+    public interface SchoolAddListener {
+
+        void onResultAfterSelect(String kraOrgNm, String schoolType, String schoolCode, String zipAdres);
+    }
+    public static void findByNameList(Region region, String name, final Context mContext, final SchoolAddListener schoolAddListener ) throws SchoolException {
+        try {
+            StringBuilder targetUrl = new StringBuilder();
+
+            targetUrl.append("https://par.").append(region.url).append("/").append(SCHOOL_CODE_URL);
+            targetUrl.append("?kraOrgNm=").append(URLEncoder.encode(name, "utf-8"));
+            targetUrl.append("&");
+
+            // 원본 데이터는 JSON형식으로 이루어져 있습니다.
+            String content = getContentFromUrl(new URL(targetUrl.toString()));
+
+
+            JSONObject jsonObject = new JSONObject(content);
+            JSONObject jsonObject2 = jsonObject.getJSONObject("resultSVO");
+            JSONObject jsonObject3 = jsonObject2.getJSONObject("data");
+
+            JSONArray items  = (JSONArray) jsonObject3.getJSONArray("orgDVOList");
+            kraOrgNmList.clear();
+            schoolTypeList.clear();
+            schoolCodeList.clear();
+            zipAdresList.clear();
+            for(int i =0; i < items.length(); i++) {
+                JSONObject jsonObject4 = (JSONObject) items.get(i);
+                /*
+                sqlAction": "",
+          "orgCode": "B100002332",
+          "kraOrgNm": "서울성북초등학교병설유치원",
+          "zipAdres": "서울특별시 성북구 성북동",
+          "schulKndScCode": "01",
+          "atptOfcdcNm": "서울특별시교육청",
+          "atptOfcdcOrgCode": "B100000001",
+          "schulCrseScCode": "1",
+          "schulCrseScCodeNm": "유치원"
+
+          "sqlAction": "",
+          "orgCode": "B100001946",
+          "kraOrgNm": "연북중학교",
+          "zipAdres": "서울 서대문구 연희3동",
+          "schulKndScCode": "03",
+          "atptOfcdcNm": "서울특별시교육청",
+          "atptOfcdcOrgCode": "B100000001",
+          "schulCrseScCode": "3",
+          "schulCrseScCodeNm": "중학교"
+                * */
+                String orgCode = jsonObject4.getString("orgCode");
+                String kraOrgNm = jsonObject4.getString("kraOrgNm");
+                String zipAdres = jsonObject4.getString("zipAdres");
+                String atptOfcdcNm = jsonObject4.getString("atptOfcdcNm");
+                String schoolCode = jsonObject4.getString("atptOfcdcOrgCode");
+                String schoolType = jsonObject4.getString("schulCrseScCode");
+                String schulCrseScCodeNm = jsonObject4.getString("schulCrseScCodeNm");
+
+                kraOrgNmList.add(kraOrgNm + "-" + zipAdres);
+                schoolTypeList.add(schoolType);
+                schoolCodeList.add(orgCode);
+                zipAdresList.add(zipAdres);
+
+
+            }
+
+
+            Looper.prepare();
+
+            new Handler().postDelayed(	new Runnable() {
+
+                public void run() {
+
+                    if(kraOrgNmList.size() == 0 ) {
+                        Toast.makeText(mContext, "찾는 학교가 없습니다.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+//하고싶은 작업ㅊ가
+                    match_text_dialog = new Dialog(mContext);
+                    match_text_dialog.setContentView(R.layout.dialog_matches_frag);
+                    match_text_dialog.setTitle("Select Matching Text");
+                    textlist = (ListView)match_text_dialog.findViewById(R.id.list);
+                    matches_text =  new ArrayList<>(kraOrgNmList);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
+                            android.R.layout.simple_list_item_1, matches_text);
+                    textlist.setAdapter(adapter);
+                    textlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view,
+                                                int position, long id) {
+                            //Speech.setText("You have said " + matches_text.get(position));
+                            schoolAddListener.onResultAfterSelect(
+                                    kraOrgNmList.get(position).split("-")[0]
+                                    ,schoolTypeList.get(position)
+                                    ,schoolCodeList.get(position)
+                                    ,zipAdresList.get(position));
+                            match_text_dialog.dismiss();
+                            match_text_dialog.hide();
+                        }
+                    });
+                    match_text_dialog.show();
+                }
+
+            }, 0);
+
+            Looper.loop();
+
+
+
+
+
+
+
+            // 기관 종류와 코드를 구합니다.
+            /*String schoolCode = content.substring(3, 13);
+            String schoolType = Utils.before(Utils.after(content,"schulCrseScCode\":\""), "\"");
+
+            return new School(Type.values()[Integer.parseInt(schoolType) - 1], region, schoolCode);*/
 
         } catch (Exception e) {
             e.printStackTrace();

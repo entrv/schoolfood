@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.ateam.hangaramapp.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <!-- A CardView that contains a TextView -->
+    <androidx.cardview.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_today_meal"
+        android:layout_gravity="center"
+        android:transitionName="@string/transition_name_today_meal_card"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:foreground="?selectableItemBackground"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="@dimen/cardview_default_elevation"
+        android:stateListAnimator="@animator/card_elevation">
+
+        <FrameLayout
+            android:id="@+id/mealwindowfrag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </FrameLayout>
+            <TextView
+                android:id="@+id/text_today_meal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:transitionName="@string/transition_name_today_meal_text"
+                android:gravity="center"
+                android:layout_margin="10dp"
+                android:textSize="20sp"
+                android:text="@string/navigation_drawer_menu_today_meal"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- A CardView that contains a TextView -->
+    <androidx.cardview.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_schedule"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:layout_below="@+id/card_today_meal"
+        android:foreground="?selectableItemBackground"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="@dimen/cardview_default_elevation"
+        android:stateListAnimator="@animator/card_elevation">
+
+        <TextView
+            android:id="@+id/schedule"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            android:text="학사 일정 예정"/>
+    </androidx.cardview.widget.CardView>
+
+    <!-- A CardView that contains a TextView -->
+    <androidx.cardview.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_time_table"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:layout_below="@+id/card_schedule"
+        android:foreground="?selectableItemBackground"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="@dimen/cardview_default_elevation"
+        android:stateListAnimator="@animator/card_elevation">
+
+        <TextView
+            android:id="@+id/time_table"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            android:text="시간표 예정"/>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

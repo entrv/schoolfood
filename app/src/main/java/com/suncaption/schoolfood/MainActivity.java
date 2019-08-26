@@ -1,22 +1,31 @@
 package com.suncaption.schoolfood;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -42,13 +51,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     Context mContext;
-
+    SchoolListRecyclerAdapter mAdapter;
+    RecyclerView recyclerView;
+    private GestureDetector gestureDetector;
+    ArrayList<SchoolListItem> rowsArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,8 +145,119 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
+        gestureDetector = new GestureDetector(getApplicationContext(),
+                new GestureDetector.SimpleOnGestureListener() {
+
+                    //누르고 뗄 때 한번만 인식하도록 하기위해서
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        return true;
+                    }
+                });
+
+        rowsArrayList = new ArrayList<>();
+        initScrollListener();
     }
 
+    private void initScrollListener() {
+        recyclerView = findViewById(R.id.school_main_rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(getApplicationContext(),
+                        new LinearLayoutManager(getApplicationContext()).getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+
+        mAdapter = new SchoolListRecyclerAdapter(rowsArrayList, Glide.with(this));
+        RecyclerView.OnItemTouchListener onItemTouchListener = new RecyclerView.OnItemTouchListener() {
+
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                //손으로 터치한 곳의 좌표를 토대로 해당 Item의 View를 가져옴
+                View childView = rv.findChildViewUnder(e.getX(), e.getY());
+
+                //터치한 곳의 View가 RecyclerView 안의 아이템이고 그 아이템의 View가 null이 아니라
+                //정확한 Item의 View를 가져왔고, gestureDetector에서 한번만 누르면 true를 넘기게 구현했으니
+                //한번만 눌려서 그 값이 true가 넘어왔다면
+                if (childView != null && gestureDetector.onTouchEvent(e)) {
+
+                    try {
+                        //현재 터치된 곳의 position을 가져오고
+                        int currentPosition = rv.getChildAdapterPosition(childView);
+
+                        //해당 위치의 Data를 가져옴
+                        SchoolListItem currentItemSchoolList = rowsArrayList.get(currentPosition);
+
+                        Intent intent = new Intent(getApplicationContext(), SchoolInfoActivity.class);
+                        intent.putExtra("schoolInfo", currentItemSchoolList);
+                        startActivity(intent);
+
+                        //getMovieUrl(currentItemMovie.getTexthref(), childView, currentItemMovie.getTextMovieTitle());
+                        //Toast.makeText(MainActivity.this, "현재 터치한 Item의 Student Name은 " + currentItemStudent.getTextMovieTitle(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        };
+        recyclerView.addOnItemTouchListener(onItemTouchListener);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+
+            }
+        });
+
+
+
+
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("entrv", "onResume: AddFragment");
+        rowsArrayList.clear();
+        SharedPreferences preferences = getApplicationContext()
+                .getSharedPreferences("mySchoolList", Activity.MODE_PRIVATE);
+        Map<String, ?> memoryMap = preferences.getAll();
+
+        for (Map.Entry<String,?> entry : memoryMap.entrySet()){
+            String[] school_item = entry.getValue().toString().split(",");
+            //연북중학교,1,1,3,B100001946
+            //String kraOrgNm, String schoolType, String schoolCode
+            //            , String schoolGrade , String schoolClass
+            SchoolListItem selectedSchoolListItem = new SchoolListItem(
+                    school_item[0], school_item[3], school_item[4], school_item[1],school_item[2]);
+            rowsArrayList.add(selectedSchoolListItem);
+            mAdapter.notifyDataSetChanged();
+
+        }
+
+    }
 
     @Override
     public void onBackPressed() {
