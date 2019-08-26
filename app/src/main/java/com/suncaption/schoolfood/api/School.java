@@ -339,7 +339,7 @@ public class School {
                 throw new SchoolException("반 너무 깁니다..");
             }
 
-            DateTimeZone.setDefault(DateTimeZone.forID("Asia/Seoul"));
+
             DateTime dateTime = new DateTime();
 
 

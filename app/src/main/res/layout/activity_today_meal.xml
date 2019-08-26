@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    tools:context="com.ateam.hangaramapp.TodayMealActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_today_meal"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <com.squareup.timessquare.CalendarPickerView
+            android:id="@+id/calendar_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="?attr/actionBarSize"
+            android:paddingBottom="100dp"
+            />
+
+    </RelativeLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+    </androidx.viewpager.widget.ViewPager>
+
+
+    <!-- A CardView that contains a TextView -->
+    <androidx.cardview.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:id="@+id/mealwindow_container"
+        card_view:contentPadding="5dp"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="@dimen/cardview_default_elevation"
+        android:clickable="true"
+        android:transitionName="@string/transition_name_today_meal_card"
+        android:foreground="?selectableItemBackground"
+        android:layout_alignParentBottom="true"
+        android:stateListAnimator="@animator/card_elevation">
+
+        <TextView
+            android:id="@+id/schedule_today_meal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="45dp"
+            android:gravity="center"
+            android:transitionName="@string/transition_name_today_meal_text"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:text="오늘의 급식이 표시되는 공간입니다."/>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</RelativeLayout>

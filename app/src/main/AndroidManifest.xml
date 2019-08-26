@@ -11,7 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SchoolInfoActivity"></activity>
+        <activity android:name=".SchoolInfoActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            ></activity>
+
+        <activity android:name=".TodayMealActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            ></activity>
         <activity android:name=".SchoolAddActivity" />
         <activity
             android:name=".MainActivity"

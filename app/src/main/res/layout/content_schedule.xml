@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.ateam.hangaramapp.MainActivity"
-    tools:showIn="@layout/app_bar_main">
+    tools:showIn="@layout/app_bar_schoolinfo">
 
     <!-- A CardView that contains a TextView -->
     <androidx.cardview.widget.CardView
@@ -25,7 +25,9 @@
         android:foreground="?selectableItemBackground"
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="@dimen/cardview_default_elevation"
-        android:stateListAnimator="@animator/card_elevation">
+        android:stateListAnimator="@animator/card_elevation"
+        app:cardBackgroundColor="@color/calendar_bg"
+        >
 
         <FrameLayout
             android:id="@+id/mealwindowfrag"
@@ -35,8 +37,8 @@
         </FrameLayout>
             <TextView
                 android:id="@+id/text_today_meal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:transitionName="@string/transition_name_today_meal_text"
                 android:gravity="center"
@@ -67,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="20sp"
-            android:text="학사 일정 예정"/>
+            android:text="학사 일정"/>
     </androidx.cardview.widget.CardView>
 
     <!-- A CardView that contains a TextView -->
@@ -91,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="20sp"
-            android:text="시간표 예정"/>
+            android:text="시간표"/>
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
